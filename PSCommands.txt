@@ -1,0 +1,3 @@
+Since I am using p12 file while connecting using path, I had to convert them to to PEM format since the command that you asked me to run was in this format
+./openssl pkcs12 -in C:/OHS/testcerts/newlabtswildcard.p12 -clcerts -nokeys -out C:/OHS/testcerts/certificate.pem -password pass:changeit
+./openssl pkcs12 -in C:/OHS/testcerts/newlabtswildcard.p12 -nocerts -out C:/OHS/testcerts/key.pem -password pass:changeit
