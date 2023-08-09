@@ -1,0 +1,30 @@
+
+PS C:\OHS\testcerts> $certificatePath = "C:\OHS\certs\newlabtswildcard.p12"
+$certificatePassword = "changeit"
+
+# Load the certificate from the specified path and password
+try {
+    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificatePath, $certificatePassword)
+} catch {
+    Write-Error "Failed to load the certificate: $_"
+    exit 1
+}
+
+# Verify the certificate chain
+$chainPolicy = New-Object System.Security.Cryptography.X509Certificates.X509ChainPolicy
+$chainPolicy.RevocationMode = [System.Security.Cryptography.X509Certificates.X509RevocationMode]::Online
+
+$chain = New-Object System.Security.Cryptography.X509Certificates.X509Chain
+$chain.ChainPolicy = $chainPolicy
+$isValidChain = $chain.Build($cert)
+
+if (!$isValidChain) {
+    Write-Warning "The certificate chain is not valid or trusted:"
+    foreach ($status in $chain.ChainStatus) {
+        Write-Warning "Status: $($status.Status), Information: $($status.StatusInformation)"
+    }
+} else {
+    Write-Host "The certificate and the chain are valid and trusted."
+}
+
+The certificate and the chain are valid and trusted.

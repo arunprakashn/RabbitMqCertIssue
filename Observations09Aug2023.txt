@@ -1,0 +1,77 @@
+Observations:
+
+PS C:\Program Files\OpenSSL-Win64\bin> ./openssl pkcs12 -inkey C:/OHS/testcerts/key.pem -in C:/OHS/testcerts/certificate.pem -certfile C:/OHS/testcerts/gdig2.crt.pem -export -out C:/OHS/testcerts/client_localhost_certificate.pfx
+Enter pass phrase for C:/OHS/testcerts/key.pem:
+Enter Export Password:
+Verifying - Enter Export Password:
+
+Comment: gdig2.crt.pem -> this is the intermediate.  hope this is correct . Taken from https://certs.godaddy.com/repository/gdig2.crt.pem
+
+
+PS C:\OHS\testcerts> Import-Certificate -Verbose -FilePath 'C:/OHS/testcerts/gdig2.crt' -CertStoreLocation cert:\CurrentUser\Root
+VERBOSE: Performing the operation "Import certificate" on target "Item: C:\OHS\testcerts\gdig2.crt Destination: Root".
+
+
+   PSParentPath: Microsoft.PowerShell.Security\Certificate::CurrentUser\Root
+
+Thumbprint                                Subject                                                                                                                        
+----------                                -------                                                                                                                        
+27AC9369FAF25207BB2627CEFACCBE4EF9C319B8  CN=Go Daddy Secure Certificate Authority - G2, OU=http://certs.godaddy.com/repository/, O="GoDaddy.com, Inc.", L=Scottsdale,...
+
+
+
+PS C:\OHS\testcerts> 
+certutil command says the certificate. Only RabbitMq Client says its not.
+PS C:\Program Files\OpenSSL-Win64\bin> certutil -verifystore My
+My "Personal"
+================ Certificate 0 ================
+Serial Number: d9b3b00218f71d52
+Issuer: CN=Go Daddy Secure Certificate Authority - G2, OU=http://certs.godaddy.com/repository/, O=GoDaddy.com, Inc., L=Scottsdale, S=Arizona, C=US
+ NotBefore: 2/15/2023 5:30 PM
+ NotAfter: 2/13/2024 8:32 PM
+Subject: CN=*.labts.net
+Non-root Certificate
+Cert Hash(sha1): f3bb17cb13a5baef6300259404e9ccc3082e1c83
+  Key Container = {C2C206E9-1044-40D2-A2FA-214B04EFAA3E}
+  Unique container name: a3225b9e159db55aa5f2183086ebaf9b_b228dcc9-0ae9-4651-8e72-f835bf971c33
+  Provider = Microsoft Enhanced Cryptographic Provider v1.0
+Private key is NOT exportable
+Encryption test passed
+Verified Issuance Policies:
+    2.16.840.1.114413.1.7.23.1
+    2.23.140.1.2.1
+Verified Application Policies:
+    1.3.6.1.5.5.7.3.1 Server Authentication
+    1.3.6.1.5.5.7.3.2 Client Authentication
+Certificate is valid
+
+
+PS C:\Program Files\OpenSSL-Win64\bin> C:\Users\Administrator\Documents\Arun\net7.0\RabbitMqCertCheck.exe
+RabbitMQConfig:
+  CertificatePassphrase=changeit (JsonConfigurationProvider for 'appsettings.json' (Required))
+  CertificatePath=C:\OHS\testcerts\client_localhost_certificate.pfx (JsonConfigurationProvider for 'appsettings.json' (Required))
+  Hostname=lab12app2.mel.labts.net (JsonConfigurationProvider for 'appsettings.json' (Required))
+  Password=your_password (JsonConfigurationProvider for 'appsettings.json' (Required))
+  Port=5671 (JsonConfigurationProvider for 'appsettings.json' (Required))
+  ThumbPrint=d89e3bd43d5d909b47a18977aa9d5ce36cee184c (JsonConfigurationProvider for 'appsettings.json' (Required))
+  Username=your_username (JsonConfigurationProvider for 'appsettings.json' (Required))
+  VirtualHost=/ (JsonConfigurationProvider for 'appsettings.json' (Required))
+
+None of the specified endpoints were reachable      at RabbitMQ.Client.ConnectionFactory.CreateConnection(IEndpointResolver endpointResolver, String clientProvidedName)
+   at RabbitMQ.Client.ConnectionFactory.CreateConnection(String clientProvidedName)
+   at RabbitMQ.Client.ConnectionFactory.CreateConnection()
+   at RabbitMqCertCheck.Program.Main(String[] args) in C:\Users\anagendr\source\repos\RabbitMqCertCheck\Program.cs:line 67System.AggregateException: One or more errors occurred. (Authentication failed, see inner exception.)
+ ---> System.Security.Authentication.AuthenticationException: Authentication failed, see inner exception.
+ ---> System.ComponentModel.Win32Exception (0x80090325): The certificate chain was issued by an authority that is not trusted.
+   --- End of inner exception stack trace ---
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+   at RabbitMQ.Client.Impl.SslHelper.<>c__DisplayClass2_0.<TcpUpgrade>b__0(SslOption opts)
+   at RabbitMQ.Client.Impl.SslHelper.TcpUpgrade(Stream tcpStream, SslOption options)
+   at RabbitMQ.Client.Impl.SocketFrameHandler..ctor(AmqpTcpEndpoint endpoint, Func`2 socketFactory, TimeSpan connectionTimeout, TimeSpan readTimeout, TimeSpan writeTimeout)
+   at RabbitMQ.Client.Framing.Impl.IProtocolExtensions.CreateFrameHandler(IProtocol protocol, AmqpTcpEndpoint endpoint, ArrayPool`1 pool, Func`2 socketFactory, TimeSpan connectionTimeout, TimeSpan readTimeout, TimeSpan writeTimeout)
+   at RabbitMQ.Client.ConnectionFactory.CreateFrameHandler(AmqpTcpEndpoint endpoint)
+   at RabbitMQ.Client.EndpointResolverExtensions.SelectOne[T](IEndpointResolver resolver, Func`2 selector)
+   --- End of inner exception stack trace ---
+   at RabbitMQ.Client.EndpointResolverExtensions.SelectOne[T](IEndpointResolver resolver, Func`2 selector)
+   at RabbitMQ.Client.Framing.Impl.AutorecoveringConnection.Init(IEndpointResolver endpoints)
+   at RabbitMQ.Client.ConnectionFactory.CreateConnection(IEndpointResolver endpointResolver, String clientProvidedName)
