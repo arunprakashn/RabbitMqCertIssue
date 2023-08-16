@@ -18,8 +18,9 @@ namespace TlsSslStreamRabbitMq
                 Console.WriteLine($"{serverAddress} \n {serverPort} \n {certificatePath} \n");
                 TcpClient client = new TcpClient();
                 await client.ConnectAsync(serverAddress, serverPort);
-
                 X509Certificate2 clientCertificate = new X509Certificate2(certificatePath, certificatePassword);
+
+
                 X509Chain chain = new X509Chain();
                 chain.Build(clientCertificate);
 
@@ -28,6 +29,7 @@ namespace TlsSslStreamRabbitMq
                     Console.WriteLine($"Element Info Thumbprint: {element.Certificate.Thumbprint} \n Friendly Name: {element.Certificate.FriendlyName} \n Issuer: {element.Certificate.Issuer} \n Subject {element.Certificate.SubjectName.Name} \n Expiration {element.Certificate.GetExpirationDateString()} ");
                     Console.WriteLine("\n \n ");
                 }
+                Console.WriteLine($"ChainStatus Count: {chain.ChainStatus.Length}");
                 foreach (X509ChainStatus status in chain.ChainStatus)
                 {
                     Console.WriteLine("Chain status: " + status.Status);
